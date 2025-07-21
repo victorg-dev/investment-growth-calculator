@@ -1,10 +1,39 @@
-import java.util.InputMismatchException;
-import java.util.Scanner;
+/**
+ * Inputs:
+ * 	•	Initial investment amount
+ * 	•	Monthly/annual contribution
+ * 	•	Expected annual return rate (e.g., 7%)
+ * 	•	Time horizon in years
+ *
+ * Outputs:
+ * 	•	[X]Total portfolio value at the end
+ * 	•	[]Total contributions vs total growth
+ * 	•	[]Optional: a year-by-year breakdown
+ * 	•	[]Optional: include inflation adjustment
+ *
+ * Why it’s useful: Shows how your investments can grow over time.
+ */
+
+import java.util.*;
 
 public class Main {
-    public static void main(String[] args) {
-        int initialInvestment = (int) readNumber("Initial Investment Amount ($1K - $1M): ", 1000, 1_000_000);
 
+    final static int PERCENT_TO_DECIMAL = 100;
+
+    public static void main(String[] args) {
+        int principal = (int) readNumber("Initial Investment Amount ($1K - $1M): ", 1000, 1_000_000);
+        int annualContributionAmount = (int) readNumber("Annual Contribution ($0 - $1M): ", 0, 1_000_000);
+        double annualInterestRatePercent = readNumber("Expected Annual Return Rate (1% - 100%): ", 1, 100);
+        int years = (int) readNumber("Time Horizon (Years): ", 1, 100);
+
+        double portfolioValue = calculatePortfolioValue(
+                principal,
+                annualContributionAmount,
+                annualInterestRatePercent,
+                years);
+
+        // TODO: format to currency
+        System.out.println("Portfolio Value: " + portfolioValue);
     }
 
     // Return a double and cast to a different type
@@ -26,5 +55,25 @@ public class Main {
             }
         }
         return value;
+    }
+
+    public static double calculatePortfolioValue(
+            int principal,
+            int periodicContributionAmount,
+            double periodicInterestRatePercent,
+            int timePeriods) {
+
+        // A = P * (1 + r)^t + PMT * [((1 + r)^t - 1) / r]
+        //
+        // P = Initial investment, r = Periodic interest rate
+        // n = 1, t = time periods elapsed (months, years, etc)
+        // PMT = Periodic contribution amount
+
+        double periodicInterestRateDecimal = periodicInterestRatePercent / PERCENT_TO_DECIMAL;
+
+        return principal
+                * Math.pow(1 + periodicInterestRateDecimal, timePeriods)
+                + periodicContributionAmount
+                * ((Math.pow(1 + periodicInterestRateDecimal, timePeriods) - 1) / periodicInterestRateDecimal);
     }
 }
