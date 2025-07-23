@@ -8,12 +8,13 @@
  * Outputs:
  * 	•	[X]Total portfolio value at the end
  * 	•	[]Total contributions vs total growth
- * 	•	[]Optional: a year-by-year breakdown
- * 	•	[]Optional: include inflation adjustment
+ * 	•	[]A year-by-year breakdown
+ * 	•	[]Inflation adjusted returns
  *
  * Why it’s useful: Shows how your investments can grow over time.
  */
 
+import java.text.NumberFormat;
 import java.util.*;
 
 public class Main {
@@ -32,8 +33,7 @@ public class Main {
                 annualInterestRatePercent,
                 years);
 
-        // TODO: format to currency
-        System.out.println("Portfolio Value: " + portfolioValue);
+        printPortfolioValue(portfolioValue);
     }
 
     // Return a double and cast to a different type
@@ -75,5 +75,10 @@ public class Main {
                 * Math.pow(1 + periodicInterestRateDecimal, timePeriods)
                 + periodicContributionAmount
                 * ((Math.pow(1 + periodicInterestRateDecimal, timePeriods) - 1) / periodicInterestRateDecimal);
+    }
+
+    public static void printPortfolioValue(double portfolioValue) {
+        String portfolioValueFormatted = NumberFormat.getCurrencyInstance().format(portfolioValue);
+        System.out.println("Portfolio Value: " + portfolioValueFormatted);
     }
 }
