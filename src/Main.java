@@ -1,7 +1,7 @@
 /**
  * Inputs:
  * 	•	Initial investment amount
- * 	•	Monthly/annual contribution
+ * 	•	Annual contribution amount
  * 	•	Expected annual return rate (e.g., 7%)
  * 	•	Time horizon in years
  *
@@ -9,6 +9,8 @@
  * 	•	[X]Total portfolio value at the end
  * 	•	[]Total contributions vs total growth
  * 	•	[]A year-by-year breakdown
+ * 	    - function to print each year
+ * 	    - function to calculate new total for each period
  * 	•	[]Inflation adjusted returns
  *
  * Why it’s useful: Shows how your investments can grow over time.
@@ -59,22 +61,21 @@ public class Main {
 
     public static double calculatePortfolioValue(
             int principal,
-            int periodicContributionAmount,
-            double periodicInterestRatePercent,
-            int timePeriods) {
+            int yearlyContributionAmount,
+            double yearlyInterestRatePercent,
+            int years) {
 
-        // A = P * (1 + r)^t + PMT * [((1 + r)^t - 1) / r]
+        // A = P * (1 + r)^y + YMT * [((1 + r)^y - 1) / r]
         //
-        // P = Initial investment, r = Periodic interest rate
-        // n = 1, t = time periods elapsed (months, years, etc)
-        // PMT = Periodic contribution amount
+        // P = Initial investment, r = Yearly interest rate
+        // y = Years elapsed, YMT = Yearly contribution amount
 
-        double periodicInterestRateDecimal = periodicInterestRatePercent / PERCENT_TO_DECIMAL;
+        double yearlyInterestRateDecimal = yearlyInterestRatePercent / PERCENT_TO_DECIMAL;
 
         return principal
-                * Math.pow(1 + periodicInterestRateDecimal, timePeriods)
-                + periodicContributionAmount
-                * ((Math.pow(1 + periodicInterestRateDecimal, timePeriods) - 1) / periodicInterestRateDecimal);
+                * Math.pow(1 + yearlyInterestRateDecimal, years)
+                + yearlyContributionAmount
+                * ((Math.pow(1 + yearlyInterestRateDecimal, years) - 1) / yearlyInterestRateDecimal);
     }
 
     public static void printPortfolioValue(double portfolioValue) {
