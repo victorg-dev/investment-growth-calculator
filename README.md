@@ -38,5 +38,4 @@ The tool runs in the terminal and guides users through entering investment detai
 ## Planned features include:
 - Flexible support for contribution frequency
 - Contributions vs total growth comparison
-- Year-by-year breakdown
 - Inflation adjusted returns
