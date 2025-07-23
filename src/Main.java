@@ -7,11 +7,11 @@
  *
  * Outputs:
  * 	•	[X]Total portfolio value at the end
- * 	•	[]Total contributions vs total growth
- * 	•	[]A year-by-year breakdown
+ * 	•	[X]A year-by-year breakdown
  * 	    - function to print each year
- * 	    - function to calculate new total for each period
+ * 	•   []Total contributions vs total growth
  * 	•	[]Inflation adjusted returns
+ * 	•   []Loop program with option to exit out (options menu?)
  *
  * Why it’s useful: Shows how your investments can grow over time.
  */
@@ -24,18 +24,25 @@ public class Main {
     final static int PERCENT_TO_DECIMAL = 100;
 
     public static void main(String[] args) {
+        // TODO: make a function for taking all these inputs
         int principal = (int) readNumber("Initial Investment Amount ($1K - $1M): ", 1000, 1_000_000);
         int annualContributionAmount = (int) readNumber("Annual Contribution ($0 - $1M): ", 0, 1_000_000);
         double annualInterestRatePercent = readNumber("Expected Annual Return Rate (1% - 100%): ", 1, 100);
         int years = (int) readNumber("Time Horizon (Years): ", 1, 100);
 
-        double portfolioValue = calculatePortfolioValue(
+        double endPortfolioValue = calculatePortfolioValue(
                 principal,
                 annualContributionAmount,
                 annualInterestRatePercent,
                 years);
 
-        printPortfolioValue(portfolioValue);
+        printYearlyPortfolioValues(
+                principal,
+                annualContributionAmount,
+                annualInterestRatePercent,
+                years);
+
+        printEndPortfolioValue(endPortfolioValue);
     }
 
     // Return a double and cast to a different type
@@ -65,10 +72,10 @@ public class Main {
             double yearlyInterestRatePercent,
             int years) {
 
-        // A = P * (1 + r)^y + YMT * [((1 + r)^y - 1) / r]
+        // A = P * (1 + r)^y + C * [((1 + r)^y - 1) / r]
         //
         // P = Initial investment, r = Yearly interest rate
-        // y = Years elapsed, YMT = Yearly contribution amount
+        // y = Years elapsed, C = Contribution amount
 
         double yearlyInterestRateDecimal = yearlyInterestRatePercent / PERCENT_TO_DECIMAL;
 
@@ -78,8 +85,34 @@ public class Main {
                 * ((Math.pow(1 + yearlyInterestRateDecimal, years) - 1) / yearlyInterestRateDecimal);
     }
 
-    public static void printPortfolioValue(double portfolioValue) {
-        String portfolioValueFormatted = NumberFormat.getCurrencyInstance().format(portfolioValue);
-        System.out.println("Portfolio Value: " + portfolioValueFormatted);
+    public static void printYearlyPortfolioValues(
+            int principal,
+            int yearlyContributionAmount,
+            double yearlyInterestRatePercent,
+            int years) {
+
+        System.out.println();
+        System.out.println("YEAR-BY-YEAR BREAKDOWN");
+        System.out.println("----------------------");
+        System.out.println();
+
+        // Print the portfolio value at the end of each year
+        for (int year = 1; year <= years; year++) {
+            System.out.println("YEAR " + year + ": " +
+                    formatToCurrency(calculatePortfolioValue(
+                        principal,
+                        yearlyContributionAmount,
+                        yearlyInterestRatePercent,
+                        year)));
+        }
+    }
+
+    public static void printEndPortfolioValue(double endPortfolioValue) {
+        System.out.println(); // add space
+        System.out.println("End Portfolio Value: " + formatToCurrency(endPortfolioValue));
+    }
+
+    public static String formatToCurrency(double number) {
+        return NumberFormat.getCurrencyInstance().format(number);
     }
 }
