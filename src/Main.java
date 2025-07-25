@@ -10,9 +10,9 @@
  * 	•	[X]A year-by-year breakdown
  * 	    - function to print each year
  * 	•   [X]Loop program with option to exit out (options menu?)
+ * 	    [] - Separate the reading numbers logic from main method
  * 	    [] - Total contributions vs total growth
  * 		[] - Inflation adjusted returns
- * 	    [] - Separate the reading numbers logic from main method
  */
 
 import java.text.NumberFormat;
@@ -21,6 +21,7 @@ import java.util.*;
 public class Main {
 
     final static int PERCENT_TO_DECIMAL = 100;
+    final static double INFLATION_RATE = 0.032; // long term avg in the US
 
     public static void main(String[] args) {
         // TODO: make a function for taking all these inputs
@@ -29,13 +30,19 @@ public class Main {
         double annualInterestRatePercent = readNumber("Expected Annual Return Rate (1% - 100%): ", 1, 100);
         int years = (int) readNumber("Time Horizon (Years): ", 1, 100);
 
-        double endPortfolioValue = calculatePortfolioValue(
+        double portfolioValue = calculatePortfolioValue(
                 principal,
                 annualContributionAmount,
                 annualInterestRatePercent,
                 years);
 
-        printEndPortfolioValue(endPortfolioValue);
+        double inflationAdjustedPortfolioValue = calculateInflationAdjustedPortfolioValue(
+                principal,
+                annualContributionAmount,
+                annualInterestRatePercent,
+                years);
+
+        printPortfolioValue(portfolioValue, "End Portfolio Value: ");
 
         // program loop
         while (true) {
@@ -45,7 +52,9 @@ public class Main {
                     principal,
                     annualContributionAmount,
                     annualInterestRatePercent,
-                    years);
+                    years,
+                    portfolioValue,
+                    inflationAdjustedPortfolioValue);
 
             if (usersChoice == 5)
                 break;
@@ -75,8 +84,8 @@ public class Main {
 
     public static double calculatePortfolioValue(
             int principal,
-            int yearlyContributionAmount,
-            double yearlyInterestRatePercent,
+            int annualContributionAmount,
+            double annualInterestRatePercent,
             int years) {
 
         // A = P * (1 + r)^y + C * [((1 + r)^y - 1) / r]
@@ -84,18 +93,35 @@ public class Main {
         // P = Initial investment, r = Yearly interest rate
         // y = Years elapsed, C = Contribution amount
 
-        double yearlyInterestRateDecimal = yearlyInterestRatePercent / PERCENT_TO_DECIMAL;
+        double annualInterestRateDecimal = annualInterestRatePercent / PERCENT_TO_DECIMAL;
 
         return principal
-                * Math.pow(1 + yearlyInterestRateDecimal, years)
-                + yearlyContributionAmount
-                * ((Math.pow(1 + yearlyInterestRateDecimal, years) - 1) / yearlyInterestRateDecimal);
+                * Math.pow(1 + annualInterestRateDecimal, years)
+                + annualContributionAmount
+                * ((Math.pow(1 + annualInterestRateDecimal, years) - 1) / annualInterestRateDecimal);
+    }
+
+    public static double calculateInflationAdjustedPortfolioValue(
+            int principal,
+            int annualContributionAmount,
+            double annualInterestRatePercent,
+            int years) {
+
+        double annualInterestRateDecimal = annualInterestRatePercent / PERCENT_TO_DECIMAL;
+
+        double realReturnPercent = (((1 + annualInterestRateDecimal) / (1 + INFLATION_RATE)) - 1) * PERCENT_TO_DECIMAL;
+
+        return calculatePortfolioValue(
+                principal,
+                annualContributionAmount,
+                realReturnPercent,
+                years);
     }
 
     public static void printYearlyPortfolioValues(
             int principal,
-            int yearlyContributionAmount,
-            double yearlyInterestRatePercent,
+            int annualContributionAmount,
+            double annualInterestRatePercent,
             int years) {
 
         System.out.println();
@@ -107,49 +133,16 @@ public class Main {
         for (int year = 1; year <= years; year++) {
             System.out.println("YEAR " + year + ": " +
                     formatToCurrency(calculatePortfolioValue(
-                        principal,
-                        yearlyContributionAmount,
-                        yearlyInterestRatePercent,
-                        year)));
+                            principal,
+                            annualContributionAmount,
+                            annualInterestRatePercent,
+                            year)));
         }
     }
 
-    public static void printEndPortfolioValue(double endPortfolioValue) {
+    public static void printPortfolioValue(double portfolioValue, String prompt) {
         System.out.println();
-        System.out.println("End Portfolio Value: " + formatToCurrency(endPortfolioValue));
-    }
-
-    public static String formatToCurrency(double number) {
-        return NumberFormat.getCurrencyInstance().format(number);
-    }
-
-    public static int navigateMenuOptions(
-            int principal,
-            int yearlyContributionAmount,
-            double yearlyInterestRatePercent,
-            int years) {
-
-        // TODO: ADD INPUT VALIDATION
-
-        Scanner scanner = new Scanner(System.in);
-
-        int usersChoice = scanner.nextInt();
-
-        // TODO: ADD MORE SWITCH CASES
-        switch (usersChoice) {
-            case 1 -> printYearlyPortfolioValues(
-                    principal,
-                    yearlyContributionAmount,
-                    yearlyInterestRatePercent,
-                    years);
-            case 2 -> calculateContributionsVsGrowth();
-        }
-
-        return usersChoice;
-    }
-
-    public static void calculateContributionsVsGrowth() {
-
+        System.out.println(prompt + formatToCurrency(portfolioValue));
     }
 
     public static void printMenuOptions() {
@@ -163,5 +156,51 @@ public class Main {
         System.out.println("5. Exit");
         System.out.println("================================");
         System.out.println();
+    }
+
+    public static void printInflationAdjustedPortfolioValue(
+            double inflationAdjustedPortfolioValue,
+            String prompt) {
+        System.out.println(prompt + formatToCurrency(inflationAdjustedPortfolioValue));
+    }
+
+    public static String formatToCurrency(double number) {
+        return NumberFormat.getCurrencyInstance().format(number);
+    }
+
+    public static int navigateMenuOptions(
+            int principal,
+            int yearlyContributionAmount,
+            double yearlyInterestRatePercent,
+            int years,
+            double portfolioValue,
+            double inflationAdjustedPortfolioValue) {
+
+        // TODO: ADD INPUT VALIDATION
+
+        Scanner scanner = new Scanner(System.in);
+
+        int usersChoice = scanner.nextInt();
+
+        // TODO: ADD MORE SWITCH CASES
+        switch (usersChoice) {
+            case 1:
+                printYearlyPortfolioValues(
+                        principal,
+                        yearlyContributionAmount,
+                        yearlyInterestRatePercent,
+                        years);
+                break;
+            case 3:
+                printPortfolioValue(
+                        portfolioValue,
+                        "Portfolio Value (Nominal): ");
+                printInflationAdjustedPortfolioValue(
+                        inflationAdjustedPortfolioValue,
+                        "Portfolio Value (Inflation-Adjusted): ");
+                break;
+        }
+
+        return usersChoice;
     }
 }
