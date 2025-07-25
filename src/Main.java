@@ -36,13 +36,15 @@ public class Main {
                 annualInterestRatePercent,
                 years);
 
-        printYearlyPortfolioValues(
+        printEndPortfolioValue(endPortfolioValue);
+
+        printMenuOptions();
+
+        navigateMenuOptions(
                 principal,
                 annualContributionAmount,
                 annualInterestRatePercent,
                 years);
-
-        printEndPortfolioValue(endPortfolioValue);
     }
 
     // Return a double and cast to a different type
@@ -108,11 +110,48 @@ public class Main {
     }
 
     public static void printEndPortfolioValue(double endPortfolioValue) {
-        System.out.println(); // add space
+        System.out.println();
         System.out.println("End Portfolio Value: " + formatToCurrency(endPortfolioValue));
     }
 
     public static String formatToCurrency(double number) {
         return NumberFormat.getCurrencyInstance().format(number);
+    }
+
+    public static void navigateMenuOptions(
+            int principal,
+            int yearlyContributionAmount,
+            double yearlyInterestRatePercent,
+            int years) {
+
+        Scanner scanner = new Scanner(System.in);
+
+        int choice = scanner.nextInt();
+
+        switch (choice) {
+            case 1 -> printYearlyPortfolioValues(
+                    principal,
+                    yearlyContributionAmount,
+                    yearlyInterestRatePercent,
+                    years);
+            case 2 -> calculateContributionsVsGrowth();
+        }
+    }
+
+    public static void calculateContributionsVsGrowth() {
+
+    }
+
+    public static void printMenuOptions() {
+        System.out.println();
+        System.out.println("======== MENU OPTIONS ========");
+        System.out.println("1. Show Investment Growth Summary");
+        System.out.println("2. Show Contributions vs. Growth Breakdown");
+        System.out.println("3. Show Inflation-Adjusted Returns");
+        System.out.println("--------------------------------------");
+        System.out.println("4. Start New Calculation");
+        System.out.println("5. Exit");
+        System.out.println("================================");
+        System.out.println();
     }
 }
