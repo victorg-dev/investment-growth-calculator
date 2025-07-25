@@ -9,11 +9,10 @@
  * 	•	[X]Total portfolio value at the end
  * 	•	[X]A year-by-year breakdown
  * 	    - function to print each year
- * 	•   []Total contributions vs total growth
- * 	•	[]Inflation adjusted returns
- * 	•   []Loop program with option to exit out (options menu?)
- *
- * Why it’s useful: Shows how your investments can grow over time.
+ * 	•   [X]Loop program with option to exit out (options menu?)
+ * 	    [] - Total contributions vs total growth
+ * 		[] - Inflation adjusted returns
+ * 	    [] - Separate the reading numbers logic from main method
  */
 
 import java.text.NumberFormat;
@@ -38,13 +37,19 @@ public class Main {
 
         printEndPortfolioValue(endPortfolioValue);
 
-        printMenuOptions();
+        // program loop
+        while (true) {
+            printMenuOptions();
 
-        navigateMenuOptions(
-                principal,
-                annualContributionAmount,
-                annualInterestRatePercent,
-                years);
+            int usersChoice = navigateMenuOptions(
+                    principal,
+                    annualContributionAmount,
+                    annualInterestRatePercent,
+                    years);
+
+            if (usersChoice == 5)
+                break;
+        }
     }
 
     // Return a double and cast to a different type
@@ -118,17 +123,20 @@ public class Main {
         return NumberFormat.getCurrencyInstance().format(number);
     }
 
-    public static void navigateMenuOptions(
+    public static int navigateMenuOptions(
             int principal,
             int yearlyContributionAmount,
             double yearlyInterestRatePercent,
             int years) {
 
+        // TODO: ADD INPUT VALIDATION
+
         Scanner scanner = new Scanner(System.in);
 
-        int choice = scanner.nextInt();
+        int usersChoice = scanner.nextInt();
 
-        switch (choice) {
+        // TODO: ADD MORE SWITCH CASES
+        switch (usersChoice) {
             case 1 -> printYearlyPortfolioValues(
                     principal,
                     yearlyContributionAmount,
@@ -136,6 +144,8 @@ public class Main {
                     years);
             case 2 -> calculateContributionsVsGrowth();
         }
+
+        return usersChoice;
     }
 
     public static void calculateContributionsVsGrowth() {
